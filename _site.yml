@@ -1,0 +1,12 @@
+name: "DataMiningProject"
+output_dir: "docs"
+navbar:
+  title: "Data Mining Project - Milkcow Facts"
+  left:
+  - text: "Home"
+   href: index.html
+  - text: "DataMiningProject"
+   href: DataMiningProject-MF.html
+output:
+  html_document:
+ theme: cosmo
