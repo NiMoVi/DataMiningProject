@@ -295,6 +295,6 @@ create_scatter_plot(milkcow_facts$avg_price_milk, milkcow_facts$dairy_ration) +
 
 + The scatter plot shows the relationship between the milk per cow and number of cows over the years. You can see there is a strong relationship between these two factors over time. Over the years milk per cow has increased, decreasing the number of cows needed. Producers have become better at maintaining the cows for a longer period of time or just producing more milk from the same cow. Allowing them to make higher profits by not having to invest in a higher amount of "inventory".
 + Even though throughout the years producers have been able to produce a higher amount of milk per cow, inflation has had a huge effect on the price of cows on average throughout time. From the 1980 to the year 2010 the average price per cow has increased from less than $1,250 to almost $1,800. 
-+ We see that as the price of milk goes up, the price of rations goes up as well. We could assume that this could be due to inflation.
++ We see that as the price of milk goes up, the price of rations goes up as well. A possible explanation to this could be inflation.
 
 
