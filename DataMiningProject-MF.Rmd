@@ -30,6 +30,7 @@ library(devtools)
 library(reshape2)
 library(plotly)
 library(ggplot2)
+library(forcats)
 
 options(scipen=999)
 
@@ -104,7 +105,6 @@ summary(milk_product_facts)
 print(milk_product_facts)
 
 ```
-
 + Year is incorrectly classified as a numeric type, double. This should not cause any problems unless an analysis where order is important is created. On-the-spot class changes will be done in that case.
 
 ### Summary Statistics for Clean Cheese
@@ -115,7 +115,6 @@ summary(clean_cheese)
 print(clean_cheese)
 
 ```
-
 + Data for Blue cheese is missing for a 12 year period, from 1998-2009
 + Year is incorrectly classified as a numeric type, double. This should not cause any problems unless an analysis where order is important is created. On-the-spot class changes will be done in that case.
 
@@ -139,7 +138,7 @@ The datasets all seem to be in good condition for analyses. No facilitating chan
 
 #### What are the popularity trends for fluid milk types?
 
-```{r fig.height=6, fig.width=12, echo=FALSE}
+```{r fig.height=6, fig.width=12}
 
 fluid_milk_sales %>%
   filter(milk_type == "Total Production") %>%
@@ -148,13 +147,14 @@ fluid_milk_sales %>%
   labs(x = "Pounds", y = "Count" ) + 
   scale_x_continuous()
 
+
 fluid_milk_sales %>%
   filter(milk_type == "Total Production") %>%
   ggplot(aes(x = year, y = pounds)) +
   geom_line(size = 2) +
   geom_smooth(se = FALSE) +
   scale_x_continuous(breaks = c(1975,1980,1985,1990,1995,2000,2005,2010,2015)) +
-  labs(x = "Year", y = "Pounds Sold", title = "Total Pounds of Fluid Milk Sold, 1975-2017 ") +
+  labs(x = "Year", y = "Pounds Sold", title = "Total Pounds of Fluid Milk Sold, 1975-2017") +
   theme_classic()
 
 
@@ -165,7 +165,7 @@ fluid_milk_sales_graph <- fluid_milk_sales %>%
   geom_line(size = 1) +
   scale_x_continuous(breaks = c(1975,1980,1985,1990,1995,2000,2005,2010,2015)) +
   scale_y_continuous(breaks = c(0,5000000000,10000000000,15000000000,20000000000,25000000000,30000000000,35000000000)) +
-  labs(x = "Year", y = "Pounds Sold", title = "Pounds of Fluid Milk sold by type, 1975-2017") +
+  labs(x = "Year", y = "Pounds Sold", title = "Pounds of Fluid Milk sold by type, 1975-2017", color = "Milk Type") +
   theme_classic()
 ggplotly(fluid_milk_sales_graph)
 
@@ -175,8 +175,10 @@ fluid_milk_sales %>%
   ggplot(aes(x = pounds, y = milk_type, fill = milk_type)) +
   geom_boxplot(show.legend = FALSE) +
   scale_x_continuous() +
-  labs(title = "Variability of Milk Type Sales", x = "Pounds", y = "Milk Type") +
+  labs(title = "Variability of Milk Type Sales", x = "Pounds", y = "Milk Type", fill = "Milk Type") +
   theme_gray()
+
+
 
 
 ```
@@ -185,26 +187,22 @@ fluid_milk_sales %>%
 + Overall fluid milk sales have been on a downward trend since 2010, after nearly 25 years (1985-2010) of consistent sales.
 + The demand for whole milk has declined greatly over the years. Meanwhile, 2% reduced fat milk has been on the rise. In the 1980's, whole milk was dominant while 2% reduced fat milk was in low demand. Now, they are very close in terms of demand, with 2% Reduced fat milk being ahead slightly. One can infer that societal views on fats have lead to a decline in Whole milk sales over time.
 + Whole Milk has seen the most variability compared to other fluid types, indicating that, though popular, it is very inconsistent. Skim milk also has relatively high variability while less popular fluid types have been very consistent in their sales throughout the recorded timeframe.
-+ The scatter plot graphic shows us the two most popular liquid milk types and how they have fluctuated in production over the years. Clearly, you could see that the demand for whole milk has declined greatly over the years. Meanwhile, 2% reduced fat milk has been on the rise. In the 1980's, whole milk was dominant while 2% reduced fat milk was in low demand. Now, they are very close in terms of demand, with 2% Reduced fat milk being ahead slightly.
++ The graphic shows us the two most popular liquid milk types and how they have fluctuated in production over the years. Clearly, you could see that the demand for whole milk has declined greatly over the years. Meanwhile, 2% reduced fat milk has been on the rise. In the 1980's, whole milk was dominant while 2% reduced fat milk was in low demand. Now, they are very close in terms of demand, with 2% Reduced fat milk being ahead slightly.
 
 
 ## Visualizing Distributions for "State Milk Production" dataset
 
-#### How is the distribution of milk production from Region/State?
+#### How is the milk production distributed by location?
 
 
-```{r fig.height=6, fig.width=12, echo=FALSE}
+```{r fig.height=6, fig.width=12}
 
 state_milk_production %>%
   mutate(state = fct_reorder(state, milk_produced)) %>%
   group_by("state") %>%
   ggplot(aes(x = milk_produced, y = state, fill = region)) +
   geom_boxplot() +
-  geom_dotplot(binaxis='x', 
-               stackdir='center', 
-               dotsize = .1, 
-               fill="red") +
-  labs(title = "Variability of Milk Production by State", x = "Milk Production in Lbs", y = "State") +
+  labs(title = "Variability of Milk Production by State", x = "Milk Production in Lbs", y = "State", fill = "Region") +
   theme_gray()
 
 state_milk_production %>%
@@ -213,47 +211,90 @@ state_milk_production %>%
   summarise(mean_milk = mean(milk_produced)) %>%
   ggplot(aes(x = state, y = mean_milk, fill = state)) +
   geom_col() +
-  labs(title = "Average Milk production by state, Mountain Region",x = "State", y = "Milk Produced", color = "State") +
+  labs(title = "Average Milk production by state, Mountain Region",x = "State", y = "Milk Produced", fill = "State") +
   theme_minimal()
+
+state_milk_production %>%
+  filter(region == "Lake States") %>%
+  group_by(state) %>%
+  summarise(mean_milk = mean(milk_produced)) %>%
+  ggplot(aes(x = state, y = mean_milk, fill = state)) +
+  geom_col() +
+  labs(title = "Average Milk production by state, Lake States Region",x = "State", y = "Milk Produced", fill = "State") +
+  theme_minimal()
+
+state_milk_production %>% 
+  mutate(region = fct_lump(region, n = 5)) %>%
+  group_by(region) %>%
+  summarise(mean_milk = mean(milk_produced)) %>%
+  ggplot(aes(x = region, y = mean_milk, fill = region)) + 
+  geom_col() +
+  labs(title = "Average Milk production by region", x = "Region", y = "Milk Produced", fill = "Region") +
+  theme_minimal()
+
 
 state_milk_production %>%
   filter(milk_produced >= 10000000000) %>%
   count(state, vars = year) %>%
   ggplot(aes(x = state, fill = state)) +
   geom_bar() +
-  labs(title = "# of Years that production exceeded 10B Lbs, by State",x = "State", y = "Count", color = "State") +
+  labs(title = "# of Years that production exceeded 10B Lbs, by State",x = "State", y = "Count", fill = "State") +
   theme_minimal()
 
+
+    
 ```
 
 + The boxplot represents the variability of milk production by state, color coded by region. We can see that region is not very important for milk production, the only Region that showcases similar milk production values are the Lake States and Mountain states. One can also easily see that California is by far the largest producer, and the only significant producer in its region.
-+ In the following bar graph we can see that while California and the other states are in the same region, they have wildly different milk production values. One can infer that since California is more south it has better conditions for cows to produce milk. 
++ The following two graphs show that location and land affect the amount of gallons of milk produced. The states included in the mountain region produce on average twice the amount of gallons of milk that the states included in the lake region. This is because cows live and reproduce better in mountainous areas, therefore leading to a bigger amount of milk produced every year.
++  Tying to the previous graphs, the "Average Milk Production by Year" shows us which region in the US produce more milk. Allowing us to visualize that the Pacific produces more milk than any other region by more than 2 Billion gallons. This might be caused by the temperatures in these stats which allow for a better life for the cows, leading to a bigger amount of milk production.
++ Three of the biggest state producers of milk are California, New York and Wisconsin. For over 45 years these three states have consistently produced over 10 billion gallons of milk. Again, allowing us to conclude that the cow's living conditions is a big factor that affects milk production every year.
 
-```{r}
 
-milkcow_facts %>%
-  ggplot(aes(x = milk_feed_price_ratio)) +
-  geom_histogram(bins = 15, show.legend = TRUE) + 
-  labs(x = "Feed Price Ratio", y = "Count" ) 
+## Visualizing Distributions for "Milkcow Facts" dataset
 
-milkcow_facts %>%
+#### What trends are present in the milk production industry?
+
+
+```{r fig.height=6, fig.width=12}
+
+
+yrel <- milkcow_facts %>%
   ggplot(aes(x = milk_per_cow, y = avg_milk_cow_number, color = year)) +
   geom_point() +
   geom_smooth(stat = "smooth", method = "lm") +
-  labs(x = "Milk Per Cow", y = "Average Number of Cows", color = "Year") +
+  labs(title = "Yearly Relationship Between Number of Cows and Milk Per Cow",x = "Milk Per Cow", y = "Average Number of Cows", color = "Year") +
   theme_bw()
+ggplotly(yrel)
+
 
 milkcow_facts %>%
   ggplot(aes(x = milk_per_cow, y = milk_cow_cost_per_animal, color = year)) +
-  geom_point() +
+  geom_point(size = 2) +
   geom_line() +
   geom_smooth(se = FALSE, method = "lm") +
   labs(title = "Yearly Relationship Between Milk Per Cow and Cost Per Animal",x = "Milk Per Cow", y = "Average Cost Per Cow", color = "Year") +
   theme_bw()
 
 
+create_scatter_plot <- function(x,y) {
+  ggplot(data = milkcow_facts) +
+    aes(x = x, y = y, fill = x, group =1) +
+    geom_point(state = "identity") +
+    geom_smooth(method = lm, se = FALSE)+
+    theme(axis.text.x = element_text(face = "bold", angle = 90)) +
+    theme(legend.position = "none")
+}
+
+create_scatter_plot(milkcow_facts$avg_price_milk, milkcow_facts$dairy_ration) +
+  labs(x= "Average Price of Milk", y = "Average price paid for dairy cow rations", subtitle = "Relationship between Avg. Price of Milk and Avg. Price Paid for Dairy Cow Rations")
+
+
+
 ```
 
-+ The scatter plot shows the relationship between the milk per cow and number of cows over the years. You can see there is a strong relationship between these two factors over time. Over the years milk per cow has increased, decreasing the number of cows needed.
-+ Knowing this, we should assume that a higher yield per cow
++ The scatter plot shows the relationship between the milk per cow and number of cows over the years. You can see there is a strong relationship between these two factors over time. Over the years milk per cow has increased, decreasing the number of cows needed. Producers have become better at maintaining the cows for a longer period of time or just producing more milk from the same cow. Allowing them to make higher profits by not having to invest in a higher amount of "inventory".
++ Even though throughout the years producers have been able to produce a higher amount of milk per cow, inflation has had a huge effect on the price of cows on average throughout time. From the 1980 to the year 2010 the average price per cow has increased from less than $1,250 to almost $1,800. 
++ We see that as the price of milk goes up, the price of rations goes up as well. We could assume that this could be due to inflation.
+
 
